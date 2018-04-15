@@ -65,7 +65,7 @@ class RuleRegistry(object):
             # Antecedents
             antecedent = Antecedent(np.linspace(0, 1, self._resolution-2), self.symbol(i))
 
-            for label, values in self._range_levels.iteritems():
+            for label, values in self._range_levels.items():
                 antecedent[label] = fuzz.trimf(antecedent.universe, values)
 
             self._antecedents[self.symbol(i)] = antecedent
@@ -73,7 +73,7 @@ class RuleRegistry(object):
             # Consequents
             consequent = Consequent(np.linspace(0, 1, self._resolution-2), self.symbol(i, True))
 
-            for label, values in self._range_levels.iteritems():
+            for label, values in self._range_levels.items():
                 consequent[label] = fuzz.trimf(consequent.universe, values)
 
             self._consequents[self.symbol(i, True)] = consequent
@@ -104,8 +104,8 @@ class RuleRegistry(object):
                 antecedent.append(term)
 
             key += str(self.symbol(y, True)) + str(self.matching_level(1))
-            hashed_key = str(hashlib.md5(key).hexdigest())
-
+            hashed_key = str(hashlib.md5(key.encode('utf-8')).hexdigest())
+            #hashlib.sha256(str(random.getrandbits(256)).encode('utf-8')).hexdigest()
             rule = Rule(self.concat_terms(antecedent, mode='AND'), consequent)
 
             if hashed_key not in self._raw_rules:
@@ -126,11 +126,11 @@ class RuleRegistry(object):
         fitted_rules_raw = OrderedDict()
         rule_index = 0
 
-        for key, rule in self._rules.iteritems():
+        for key, rule in self._rules.items():
             antecedents = [0 for i in range(self._unique_symbols)]
 
             for term in rule.antecedent_terms:
-                symbol = int(self.symbol_from_label(term.parent_variable.label))
+                symbol = int(self.symbol_from_label(term.label))
                 level = int(self.level_from_label(term.label))
                 antecedents[symbol] = level
 
@@ -173,7 +173,7 @@ class RuleRegistry(object):
             else:
                 fitted_rules_raw[rule.__repr__()] = rule
 
-        for key, rule in fitted_rules_raw.iteritems():
+        for key, rule in fitted_rules_raw.items():
             fitted_rules[self._rule_prefix + str(rule_index)] = rule
             rule_index += 1
 
@@ -182,7 +182,7 @@ class RuleRegistry(object):
         if self._verbose:
             print ('Fitting complete. KB is made up of %d rules:' % len(self._rules))
 
-            for key, rule in self._rules.iteritems():
+            for key, rule in self._rules.items():
                 print('%s) %r' % (key, rule))
 
     def setup_model(self, rule=None):
@@ -266,7 +266,7 @@ class RuleRegistry(object):
         if self._verbose:
             print ('Membership function ranges:')
 
-            for label, values in ranges.iteritems():
+            for label, values in ranges.items():
                 print('%s) %r' % (label, values))
 
         return ranges
@@ -286,7 +286,7 @@ class RuleRegistry(object):
         return np.array(sequence)
 
     def matching_level(self, x):
-        for label, values in self._range_levels.iteritems():
+        for label, values in self._range_levels.items():
             if np.amin(values) <= x <= np.amax(values):
                 return label
 

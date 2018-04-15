@@ -7,7 +7,7 @@ from keras.models import Sequential, model_from_json
 from keras.layers.core import Dense, Activation, Dropout
 from keras.layers.recurrent import LSTM
 from keras.utils.np_utils import to_categorical
-from rule_registry import RuleRegistry
+from fuzzyNet.rule_registry import RuleRegistry
 from tempfile import gettempdir
 
 
@@ -42,9 +42,9 @@ class SequenceProcessor(object):
         self._uuid = model_uid
 
         # Initialize AWS S3
-        session = boto3.session.Session(region_name=self._s3_archimedes_region)
-        s3_client = session.client('s3', config= boto3.session.Config(signature_version='s3v4'))
-        self._s3_transfer = S3Transfer(s3_client)
+        # session = boto3.session.Session(region_name=self._s3_archimedes_region)
+        # s3_client = session.client('s3', config= boto3.session.Config(signature_version='s3v4'))
+        # self._s3_transfer = S3Transfer(s3_client)
 
         # Prepare sequences
         self.X, self.y, self.symbol_count = self.prepare_sequence(self.sequence)
@@ -73,7 +73,7 @@ class SequenceProcessor(object):
 
         self._model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 
-    def fit(self, batch_size=64, epochs=8):
+    def fit(self, batch_size: object = 64, epochs: object = 8) -> object:
         if self._verbose:
             print ('Training model...')
 
